@@ -1,31 +1,38 @@
 # mcp-guard
 
-[![CI](https://img.shields.io/github/actions/workflow/status/your-org/mcp-guard/ci.yml?label=CI)](./.github/workflows/ci.yml)
-[![npm version](https://img.shields.io/npm/v/mcp-guard)](https://www.npmjs.com/package/mcp-guard)
+[![CI](https://img.shields.io/github/actions/workflow/status/CHANGE_ME/MCP-doctor/ci.yml?label=CI)](./.github/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/%40CHANGE_ME%2Fmcp-guard)](https://www.npmjs.com/package/@CHANGE_ME/mcp-guard)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
-Security auditing and policy gating for MCP servers (local + CI), with Markdown and SARIF output.
+Security auditing and policy gating for MCP servers (local + CI), with deterministic tests and Markdown/SARIF outputs.
 
 > Formerly **mcp-doctor**.
->
-> **Remote mode support in v0.3.0: HTTP JSON-RPC only (`--http`). SSE is not supported yet.**
+
+> [!IMPORTANT]
+> Remote mode supports **HTTP JSON-RPC only** (`--http`). SSE is not implemented.
+
+## Package name
+
+- npm package: `@CHANGE_ME/mcp-guard` (scoped to avoid name collisions)
+- CLI command after install: `mcp-guard`
+- first scoped publish: `npm publish --access public`
 
 ## 30-second quickstart
 
 ### A) No install (npx)
 
 ```bash
-npx mcp-guard audit --stdio "node fixtures/servers/hello-mcp-server/server.cjs" --out reports --fail-on off
+npx @CHANGE_ME/mcp-guard audit --stdio "node fixtures/servers/hello-mcp-server/server.cjs" --out reports --fail-on off
 ```
 
 ### B) Global install
 
 ```bash
-npm i -g mcp-guard
+npm i -g @CHANGE_ME/mcp-guard
 mcp-guard --help
 ```
 
-### C) CI quickstart (GitHub Action)
+### C) GitHub Action (paste into workflow)
 
 ```yaml
 jobs:
@@ -46,18 +53,7 @@ jobs:
           fail_on: high
 ```
 
-More details: [`docs/github-action.md`](docs/github-action.md).
-
-## What it does
-
-- Connects to MCP servers over **STDIO** (`--stdio`) and **HTTP JSON-RPC** (`--http`).
-- Runs deterministic contract tests (list tools, call tool, error shape, cancellation behavior, large payload, timeout behavior).
-- Applies schema/security rules with profiles (`default`, `strict`, `paranoid`).
-- Produces reproducible reports (`report.md`, `report.json`, `report.sarif`).
-- Supports policy gating with `--fail-on off|low|medium|high`.
-- Scans local config files (Claude Desktop/Cursor patterns) with token redaction.
-
-## In 10 seconds: output preview
+## Report preview
 
 ```text
 # MCP Guard Report
@@ -67,74 +63,53 @@ More details: [`docs/github-action.md`](docs/github-action.md).
 - Target: node fixtures/servers/hello-mcp-server/server.cjs (stdio)
 ```
 
-## Commands
-
-```bash
-# Validate / test / audit
-mcp-guard validate --stdio "node server.cjs" --profile default --out reports
-mcp-guard test --stdio "node server.cjs" --out reports
-mcp-guard audit --stdio "node server.cjs" --profile strict --fail-on medium --sarif reports/report.sarif
-
-# Remote audit (HTTP JSON-RPC only)
-mcp-guard audit --http "http://127.0.0.1:4010" --timeout-ms 30000 --fail-on off
-
-# Config scan
-mcp-guard scan --repo . --format md --out reports
-mcp-guard scan --path ~/.config/Claude/claude_desktop_config.json --format json --out reports
-
-# Registry tools
-mcp-guard registry lint registry/servers.yaml
-mcp-guard registry verify registry/servers.yaml --sample 5
-mcp-guard registry score registry/servers.yaml
-```
-
-Full CLI reference: [`docs/cli.md`](docs/cli.md).
-
 ## Architecture
 
 ```mermaid
 graph LR
   CLI[mcp-guard CLI] --> T[Transports: stdio/http]
-  T --> RPC[JSON-RPC layer]
-  RPC --> RULES[Rules + profiles]
-  RULES --> REPORT[Report: md/json/sarif]
-  REPORT --> GATE[Policy gate --fail-on]
-  GATE --> CI[CI / code scanning]
+  T --> RPC[JSON-RPC]
+  RPC --> RULES[Rules + Profiles]
+  RULES --> REP[Reports: md/json/sarif]
+  REP --> GATE[Policy Gate (--fail-on)]
+  GATE --> CI[CI / Code Scanning]
 ```
 
-## Why teams use it
+## Commands
 
-- Deterministic contract tests.
-- Reproducible, diff-friendly report outputs.
-- Offline-style registry verification heuristics.
-- Profile-based risk posture without custom scripting.
+```bash
+mcp-guard validate --stdio "node server.cjs" --profile default --out reports
+mcp-guard test --stdio "node server.cjs" --out reports
+mcp-guard audit --stdio "node server.cjs" --profile strict --fail-on medium --sarif reports/report.sarif
+mcp-guard audit --http "http://127.0.0.1:4010" --timeout-ms 30000 --fail-on off
+mcp-guard scan --repo . --format md --out reports
+mcp-guard registry lint registry/servers.yaml
+mcp-guard registry verify registry/servers.yaml --sample 5
+mcp-guard registry score registry/servers.yaml
+```
 
-## What is not supported (yet)
+## Docs site (GitHub Pages)
 
-- SSE transport.
-- Arbitrary tool fuzzing (contract tests are intentionally bounded).
+- Docs URL pattern: `https://<owner>.github.io/MCP-doctor/`
+- One-time setup: GitHub repo **Settings → Pages → Source → GitHub Actions**
+- Deploy workflow: `.github/workflows/deploy-pages.yml`
+
+## Links
+
+- Docs: https://CHANGE_ME.github.io/MCP-doctor/
+- GitHub: https://github.com/CHANGE_ME/MCP-doctor
+- npm: https://www.npmjs.com/package/@CHANGE_ME/mcp-guard
 
 ## Troubleshooting
 
-- **Node version**: use Node `>=20`.
-- **Windows quoting**: wrap `--stdio` command in double quotes.
-- **Timeouts**: increase `--timeout-ms` for slower startup servers.
-- **HTTP mode failures**: ensure target is JSON-RPC over HTTP POST.
+- Node `>=20` required
+- On Windows, wrap `--stdio` command in double quotes
+- If startup is slow, increase `--timeout-ms`
+- HTTP target must accept JSON-RPC over POST
 
-## Docs
+## Releasing
 
-- [`docs/quickstart.md`](docs/quickstart.md)
-- [`docs/cli.md`](docs/cli.md)
-- [`docs/security-model.md`](docs/security-model.md)
-- [`docs/rules.md`](docs/rules.md)
-- [`docs/github-action.md`](docs/github-action.md)
-- [`RELEASE.md`](RELEASE.md)
-
-## Contributing
-
-- Add a rule in `src/security/rules/*` and document it in `docs/rules.md`.
-- Add contract coverage in `src/tests/contract/*` and `test/contract.spec.ts`.
-- Add fixture data with `npm run fixtures:gen`.
+See [`docs/releasing.md`](docs/releasing.md) and [`RELEASE.md`](RELEASE.md).
 
 ## License
 

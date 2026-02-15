@@ -1,7 +1,7 @@
 {
-  "name": "mcp-guard",
+  "name": "@CHANGE_ME/mcp-guard",
   "version": "0.3.0",
-  "description": "Validate, test, and security-audit MCP servers and tool schemas",
+  "description": "Security auditing and policy gating for MCP servers (STDIO/HTTP) with Markdown + SARIF reports",
   "type": "module",
   "bin": {
     "mcp-guard": "dist/cli.js"
@@ -14,7 +14,10 @@
     "dev": "tsx src/cli.ts",
     "test": "vitest run",
     "lint": "tsc -p tsconfig.json --noEmit",
-    "fixtures:gen": "tsx scripts/gen-fixtures.ts"
+    "fixtures:gen": "tsx scripts/gen-fixtures.ts",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "dependencies": {
     "commander": "^12.1.0",
@@ -25,13 +28,38 @@
     "@types/node": "^22.10.2",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
-    "vitest": "^2.1.8"
+    "vitest": "^2.1.8",
+    "vitepress": "^1.6.3"
   },
   "files": [
     "dist",
-    "docs",
     "README.md",
     "LICENSE",
-    "RELEASE.md"
-  ]
+    "RELEASE.md",
+    "docs/*.md",
+    "docs/assets/demo.gif"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CHANGE_ME/MCP-doctor.git"
+  },
+  "homepage": "https://CHANGE_ME.github.io/MCP-doctor/",
+  "bugs": {
+    "url": "https://github.com/CHANGE_ME/MCP-doctor/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "dist/cli.js",
+  "types": "dist/cli.d.ts",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "security",
+    "audit",
+    "sarif",
+    "cli",
+    "lint"
+  ],
+  "scopeTodo": "TODO: replace CHANGE_ME with your npm scope before publish."
 }

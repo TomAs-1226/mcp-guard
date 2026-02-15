@@ -1,5 +1,19 @@
 # CLI Reference
 
+## Install
+
+```bash
+npm i -g @CHANGE_ME/mcp-guard
+# or
+npx @CHANGE_ME/mcp-guard --help
+```
+
+Installed command remains:
+
+```bash
+mcp-guard --help
+```
+
 ## Core commands
 
 - `mcp-guard validate --stdio <cmd>|--http <url> [--profile default|strict|paranoid] [--out reports] [--timeout-ms 30000]`
