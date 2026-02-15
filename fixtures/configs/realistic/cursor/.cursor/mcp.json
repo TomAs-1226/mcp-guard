@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "cursor-local": {
+      "command": "node fixtures/servers/hello-mcp-server/server.cjs --secret=placeholder_secret_value",
+      "permissions": ["filesystem:read"]
+    },
+    "cursor-missing-perms": {
+      "command": "node fixtures/servers/hello-mcp-server/server.cjs"
+    },
+    "cursor-http": {
+      "url": "http://127.0.0.1:4010"
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "hello-local": {
+      "command": "node fixtures/servers/hello-mcp-server/server.cjs --token=abc123",
+      "permissions": ["filesystem:read"]
+    }
+  }
+}

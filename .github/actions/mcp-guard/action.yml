@@ -1,0 +1,62 @@
+name: mcp-guard audit
+description: Run mcp-guard audit, emit SARIF, upload SARIF, and enforce fail policy
+inputs:
+  stdio_command:
+    description: Command to launch MCP server over STDIO
+    required: true
+  out_dir:
+    description: Directory for reports
+    required: false
+    default: reports
+  sarif_path:
+    description: SARIF output path
+    required: false
+    default: reports/report.sarif
+  fail_on:
+    description: Policy threshold off|low|medium|high
+    required: false
+    default: high
+  timeout_ms:
+    description: Request timeout in milliseconds
+    required: false
+    default: '30000'
+runs:
+  using: composite
+  steps:
+    - name: Install dependencies
+      shell: bash
+      run: npm ci
+
+    - name: Build mcp-guard
+      shell: bash
+      run: npm run build
+
+    - name: Run audit (non-blocking)
+      shell: bash
+      run: |
+        set +e
+        npx mcp-guard audit \
+          --stdio "${{ inputs.stdio_command }}" \
+          --out "${{ inputs.out_dir }}" \
+          --sarif "${{ inputs.sarif_path }}" \
+          --timeout-ms "${{ inputs.timeout_ms }}" \
+          --fail-on "off"
+        echo "AUDIT_EXIT=$?" >> $GITHUB_ENV
+
+    - name: Upload SARIF
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: ${{ inputs.sarif_path }}
+
+    - name: Enforce policy gate
+      shell: bash
+      run: |
+        if [ "${{ inputs.fail_on }}" = "off" ]; then
+          exit 0
+        fi
+        npx mcp-guard audit \
+          --stdio "${{ inputs.stdio_command }}" \
+          --out "${{ inputs.out_dir }}" \
+          --sarif "${{ inputs.sarif_path }}" \
+          --timeout-ms "${{ inputs.timeout_ms }}" \
+          --fail-on "${{ inputs.fail_on }}"

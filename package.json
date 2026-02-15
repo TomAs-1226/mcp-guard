@@ -1,0 +1,67 @@
+{
+  "name": "@baichen_yu/mcp-guard",
+  "version": "0.3.0",
+  "description": "Security auditing and policy gating for MCP servers (STDIO/HTTP) with Markdown + SARIF reports",
+  "type": "module",
+  "bin": {
+    "mcp-guard": "dist/cli.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "prepack": "npm run build",
+    "dev": "tsx src/cli.ts",
+    "pretest": "npm run fixtures:gen",
+    "test": "vitest run",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "fixtures:gen": "tsx scripts/gen-fixtures.ts",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "prepublishOnly": "npm run lint && npm test"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8",
+    "vitepress": "^1.6.3"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "RELEASE.md",
+    "docs/*.md",
+    "docs/assets/demo.gif"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TomAs-1226/MCP-shariff.git"
+  },
+  "homepage": "https://tomas-1226.github.io/MCP-shariff/",
+  "bugs": {
+    "url": "https://github.com/TomAs-1226/MCP-shariff/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "dist/cli.js",
+  "types": "dist/cli.d.ts",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "security",
+    "audit",
+    "sarif",
+    "cli",
+    "lint"
+  ]
+}
