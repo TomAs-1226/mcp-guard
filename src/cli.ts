@@ -44,12 +44,12 @@ function shouldFailByPolicy(findings: Finding[], failOn: FailOn): boolean {
   return findings.some((finding) => severityRank[finding.severity] >= rank[failOn]);
 }
 
-async function buildClient(options: { stdio?: string; http?: string; timeoutMs: number }): Promise<{ client: RpcClient; target: string; transport: 'stdio' | 'http' }> {
+async function buildClient(options: { stdio?: string; http?: string; timeoutMs: number; silent?: boolean }): Promise<{ client: RpcClient; target: string; transport: 'stdio' | 'http' }> {
   if (!options.stdio && !options.http) throw new Error('One of --stdio or --http is required.');
   if (options.stdio && options.http) throw new Error('Use only one transport: --stdio or --http.');
   if (options.stdio) {
     const transport = new StdioTransport();
-    await transport.start({ stdioCommand: options.stdio });
+    await transport.start({ stdioCommand: options.stdio, silent: options.silent });
     return { client: new StdioJsonRpcClient(transport, options.timeoutMs), target: options.stdio, transport: 'stdio' };
   }
   return { client: new HttpJsonRpcClient(options.http as string, options.timeoutMs), target: options.http as string, transport: 'http' };
@@ -66,7 +66,7 @@ async function executeSuite(params: {
   timeoutMs: number;
   failOn: FailOn;
 }): Promise<number> {
-  const { client, target, transport } = await buildClient({ stdio: params.stdio, http: params.http, timeoutMs: params.timeoutMs });
+  const { client, target, transport } = await buildClient({ stdio: params.stdio, http: params.http, timeoutMs: params.timeoutMs, silent: false });
 
   const findings: Finding[] = [];
   let tools: ToolDescriptor[] = [];
@@ -171,7 +171,7 @@ program.command('scan')
     for (const server of result.servers) {
       if (server.transport !== 'stdio' || !server.rawCommand) continue;
       try {
-        const { client } = await buildClient({ stdio: server.rawCommand, timeoutMs: 1000 });
+        const { client } = await buildClient({ stdio: server.rawCommand, timeoutMs: 1000, silent: true });
         await client.request('initialize', { clientInfo: { name: 'mcp-guard-scan', version: '0.3.0' } }, 1000);
         const listed = (await client.request<{ tools: ToolDescriptor[] }>('tools/list', undefined, 1000)).tools;
         const localFindings = [

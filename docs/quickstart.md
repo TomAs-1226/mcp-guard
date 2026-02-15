@@ -1,9 +1,18 @@
 # Quickstart
 
+## No install (npx)
+
 ```bash
-npm install
-npm run build
-npx mcp-guard audit --stdio "node fixtures/servers/hello-mcp-server/server.cjs" --out reports --sarif reports/report.sarif
+npx mcp-guard audit --stdio "node fixtures/servers/hello-mcp-server/server.cjs" --out reports --fail-on off
 ```
 
-Reports are written to `reports/`.
+## Global install
+
+```bash
+npm i -g mcp-guard
+mcp-guard --help
+```
+
+## Remote mode note
+
+Remote mode supports **HTTP JSON-RPC only** (`--http`). SSE is not supported yet.

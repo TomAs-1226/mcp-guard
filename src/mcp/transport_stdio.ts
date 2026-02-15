@@ -38,14 +38,14 @@ export class StdioTransport {
 
     proc.stderr.on('data', (chunk) => {
       const message = chunk.toString('utf8').trim();
-      if (message.length > 0) {
+      if (!config.silent && message.length > 0) {
         // eslint-disable-next-line no-console
         console.error(`[server stderr] ${message}`);
       }
     });
 
     proc.once('exit', (code, signal) => {
-      if (code !== 0 && signal !== 'SIGTERM') {
+      if (!config.silent && code !== 0 && signal !== 'SIGTERM') {
         // eslint-disable-next-line no-console
         console.error(`Server exited unexpectedly (code=${code}, signal=${signal})`);
       }

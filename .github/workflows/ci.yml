@@ -13,6 +13,8 @@ jobs:
         with:
           node-version: 20
       - run: npm ci
+      - run: npm run fixtures:gen
+      - run: git diff --exit-code
       - run: npm run lint
       - run: npm test
       - run: npm run build

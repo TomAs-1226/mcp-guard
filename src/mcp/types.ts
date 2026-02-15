@@ -39,6 +39,7 @@ export interface ServerConfig {
   cwd?: string;
   env?: Record<string, string>;
   timeoutMs?: number;
+  silent?: boolean;
 }
 
 export type Severity = 'low' | 'medium' | 'high';

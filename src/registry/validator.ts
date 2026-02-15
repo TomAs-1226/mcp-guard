@@ -16,6 +16,7 @@ export interface RegistryEntry {
   permissions?: string[];
   riskNotes?: string;
   securityNotes?: string;
+  [key: string]: unknown;
 }
 
 function lineOf(raw: string, needle: string, fromLine = 1): number {
@@ -31,9 +32,21 @@ export function parseRegistry(raw: string): RegistryEntry[] {
   return (parsed?.servers ?? []) as RegistryEntry[];
 }
 
+function validRepo(value: string): boolean {
+  if (!value.includes(' ')) {
+    if (value.startsWith('http://') || value.startsWith('https://')) {
+      return /^https?:\/\/[^\s]+$/.test(value);
+    }
+    return true;
+  }
+  return false;
+}
+
 export function lintRegistry(raw: string): RegistryIssue[] {
   const entries = parseRegistry(raw);
   const issues: RegistryIssue[] = [];
+  const seenNames = new Set<string>();
+  const allowedFields = new Set(['name', 'repo', 'transport', 'install', 'run', 'tags', 'permissions', 'riskNotes', 'securityNotes']);
 
   entries.forEach((entry, index) => {
     const anchor = `- name: ${entry.name ?? ''}`;
@@ -49,11 +62,40 @@ export function lintRegistry(raw: string): RegistryIssue[] {
       }
     }
 
-    if (entry.run && /(rm -rf|curl\s+.*\|\s*sh)/i.test(entry.run)) {
+    if (typeof entry.name === 'string') {
+      if (seenNames.has(entry.name)) {
+        issues.push({
+          severity: 'error',
+          message: `Duplicate server name: ${entry.name}`,
+          line: baseLine
+        });
+      }
+      seenNames.add(entry.name);
+    }
+
+    if (typeof entry.repo === 'string' && !validRepo(entry.repo)) {
+      issues.push({
+        severity: 'error',
+        message: `Entry #${index + 1} has invalid repo value: ${entry.repo}`,
+        line: lineOf(raw, 'repo:', baseLine)
+      });
+    }
+
+    for (const key of Object.keys(entry)) {
+      if (!allowedFields.has(key)) {
+        issues.push({
+          severity: 'warning',
+          message: `Entry #${index + 1} has unknown field: ${key}`,
+          line: lineOf(raw, `${key}:`, baseLine)
+        });
+      }
+    }
+
+    if (entry.run && /(rm -rf|curl\s+.*\|\s*sh)/i.test(String(entry.run))) {
       issues.push({
         severity: 'warning',
         message: `Entry #${index + 1} run command appears unsafe`,
-        line: lineOf(raw, `run:`, baseLine)
+        line: lineOf(raw, 'run:', baseLine)
       });
     }
   });

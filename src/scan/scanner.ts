@@ -20,6 +20,16 @@ export interface ScanResult {
 
 const knownConfigNames = ['claude_desktop_config.json', 'claude_desktop_config.jsonc', 'cursor_mcp.json', '.cursor/mcp.json'];
 
+function sortServers(servers: DiscoveredServer[]): DiscoveredServer[] {
+  return [...servers].sort((a, b) => {
+    const bySource = a.source.localeCompare(b.source);
+    if (bySource !== 0) return bySource;
+    const byName = a.name.localeCompare(b.name);
+    if (byName !== 0) return byName;
+    return a.path.localeCompare(b.path);
+  });
+}
+
 function stripComments(content: string): string {
   return content.replace(/^\s*\/\/.*$/gm, '');
 }
@@ -67,11 +77,11 @@ export async function scanConfigs(repoPath?: string, directPath?: string): Promi
     scannedPaths.push(absolute);
     const source = absolute.toLowerCase().includes('cursor') ? 'cursor' : 'claude_desktop';
     servers.push(...extractServers(raw, source, absolute));
-    return { scannedPaths, servers };
+    return { scannedPaths: [...scannedPaths].sort(), servers: sortServers(servers) };
   }
 
   if (!repoPath) {
-    return { scannedPaths, servers };
+    return { scannedPaths: [...scannedPaths].sort(), servers: sortServers(servers) };
   }
 
   const root = resolve(repoPath);
@@ -95,5 +105,5 @@ export async function scanConfigs(repoPath?: string, directPath?: string): Promi
     }
   }
 
-  return { scannedPaths, servers };
+  return { scannedPaths: [...scannedPaths].sort(), servers: sortServers(servers) };
 }
