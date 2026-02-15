@@ -1,6 +1,6 @@
 {
   "name": "@baichen_yu/mcp-guard",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Security auditing and policy gating for MCP servers (STDIO/HTTP) with Markdown + SARIF reports",
   "type": "module",
   "bin": {
