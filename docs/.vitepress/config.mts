@@ -1,10 +1,21 @@
 import { defineConfig } from 'vitepress';
 
+const defaultRepo = 'TomAs-1226/mcp-guard';
+const repo = process.env.DOCS_REPO ?? process.env.GITHUB_REPOSITORY ?? defaultRepo;
+const [, repoName = 'mcp-guard'] = repo.split('/');
+const normalizeBase = (value: string): string => {
+  if (!value) return '/';
+  const prefixed = value.startsWith('/') ? value : `/${value}`;
+  return prefixed.endsWith('/') ? prefixed : `${prefixed}/`;
+};
+const base = normalizeBase(process.env.DOCS_BASE ?? `/${repoName}/`);
+const repoUrl = `https://github.com/${repo}`;
+
 export default defineConfig({
   title: 'mcp-guard',
   description: 'Security auditing and policy gating for MCP servers',
-  base: '/MCP-shariff/',
-  cleanUrls: true,
+  base,
+  cleanUrls: false,
   lastUpdated: true,
   head: [
     ['meta', { name: 'theme-color', content: '#101827' }],
@@ -18,10 +29,11 @@ export default defineConfig({
       { text: 'Home', link: '/' },
       { text: 'Quickstart', link: '/quickstart' },
       { text: 'CLI', link: '/cli' },
+      { text: 'Testing', link: '/testing' },
       { text: 'Rules', link: '/rules' },
       { text: 'Security Model', link: '/security-model' },
       { text: 'GitHub Action', link: '/github-action' },
-      { text: 'GitHub', link: 'https://github.com/TomAs-1226/MCP-shariff' },
+      { text: 'GitHub', link: repoUrl },
       { text: 'npm', link: 'https://www.npmjs.com/package/@baichen_yu/mcp-guard' }
     ],
     sidebar: [
@@ -30,7 +42,8 @@ export default defineConfig({
         items: [
           { text: 'Landing', link: '/' },
           { text: 'Quickstart', link: '/quickstart' },
-          { text: 'CLI', link: '/cli' }
+          { text: 'CLI', link: '/cli' },
+          { text: 'Testing', link: '/testing' }
         ]
       },
       {
@@ -48,7 +61,7 @@ export default defineConfig({
         ]
       }
     ],
-    socialLinks: [{ icon: 'github', link: 'https://github.com/TomAs-1226/MCP-shariff' }],
+    socialLinks: [{ icon: 'github', link: repoUrl }],
     search: {
       provider: 'local'
     },

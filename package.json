@@ -44,11 +44,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/TomAs-1226/MCP-shariff.git"
+    "url": "https://github.com/TomAs-1226/mcp-guard.git"
   },
-  "homepage": "https://tomas-1226.github.io/MCP-shariff/",
+  "homepage": "https://tomas-1226.github.io/mcp-guard/",
   "bugs": {
-    "url": "https://github.com/TomAs-1226/MCP-shariff/issues"
+    "url": "https://github.com/TomAs-1226/mcp-guard/issues"
   },
   "publishConfig": {
     "access": "public"

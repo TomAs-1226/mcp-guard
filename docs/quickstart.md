@@ -27,8 +27,23 @@ npm publish --access public
 
 1. Enable **Settings → Pages → Source → GitHub Actions** once.
 2. Docs deploy from `.github/workflows/deploy-pages.yml`.
-3. Expected URL: `https://<owner>.github.io/MCP-shariff/`.
+3. Expected URL after repo rename to `mcp-guard`: `https://<owner>.github.io/mcp-guard/`.
+4. If the site renders as plain text or a blank page, confirm docs base path is set to `/<repo-name>/`.
 
 ## Remote mode note
 
-Remote mode supports **HTTP JSON-RPC only** (`--http`). SSE is not supported yet.
+Remote mode supports **HTTP JSON-RPC** (`--http`) and **SSE** (`--sse`, optional `--sse-post`).
+
+
+## SSE quick check
+
+```bash
+node fixtures/servers/sse-mcp-server/server.cjs
+# in another shell
+npx @baichen_yu/mcp-guard audit --sse "http://127.0.0.1:4013/sse" --sse-post "http://127.0.0.1:4013/message" --out reports --fail-on off
+```
+
+
+## Release auth note
+
+For automatic npm releases in GitHub Actions, create an **npm Automation token** and store it as repository secret `NPM_TOKEN`. This avoids interactive password/OTP prompts during CI publish.

@@ -5,7 +5,7 @@ export interface DiscoveredServer {
   source: 'claude_desktop' | 'cursor';
   path: string;
   name: string;
-  transport: 'stdio' | 'http' | 'unknown';
+  transport: 'stdio' | 'http' | 'sse' | 'unknown';
   command?: string;
   rawCommand?: string;
   permissions?: string[];
@@ -40,8 +40,9 @@ function redact(text: string): string {
     .replace(/Bearer\s+[A-Za-z0-9._-]+/g, 'Bearer <redacted>');
 }
 
-function detectTransport(server: Record<string, unknown>): 'stdio' | 'http' | 'unknown' {
+function detectTransport(server: Record<string, unknown>): 'stdio' | 'http' | 'sse' | 'unknown' {
   if (typeof server.command === 'string') return 'stdio';
+  if (typeof server.sseUrl === 'string' || typeof server.sse === 'string') return 'sse';
   if (typeof server.url === 'string' || typeof server.httpUrl === 'string') return 'http';
   return 'unknown';
 }

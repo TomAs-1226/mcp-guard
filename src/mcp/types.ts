@@ -36,6 +36,8 @@ export interface ToolDescriptor {
 export interface ServerConfig {
   stdioCommand?: string;
   httpUrl?: string;
+  sseUrl?: string;
+  ssePostUrl?: string;
   cwd?: string;
   env?: Record<string, string>;
   timeoutMs?: number;
@@ -63,7 +65,7 @@ export interface TestResult {
 export interface Report {
   server: {
     target: string;
-    transport: 'stdio' | 'http';
+    transport: 'stdio' | 'http' | 'sse';
     protocolVersion?: string;
   };
   tools: ToolDescriptor[];
