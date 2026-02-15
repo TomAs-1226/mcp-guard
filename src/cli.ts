@@ -2,7 +2,7 @@
 import { mkdir, readFile } from 'node:fs/promises';
 import { basename } from 'node:path';
 import { Command } from 'commander';
-import { HttpJsonRpcClient, StdioJsonRpcClient } from './mcp/jsonrpc.js';
+import { HttpJsonRpcClient, SseJsonRpcClient, StdioJsonRpcClient } from './mcp/jsonrpc.js';
 import { StdioTransport } from './mcp/transport_stdio.js';
 import { Finding, Profile, Report, RpcClient, ToolDescriptor } from './mcp/types.js';
 import { writeJsonReport } from './report/json.js';
@@ -44,20 +44,30 @@ function shouldFailByPolicy(findings: Finding[], failOn: FailOn): boolean {
   return findings.some((finding) => severityRank[finding.severity] >= rank[failOn]);
 }
 
-async function buildClient(options: { stdio?: string; http?: string; timeoutMs: number; silent?: boolean }): Promise<{ client: RpcClient; target: string; transport: 'stdio' | 'http' }> {
-  if (!options.stdio && !options.http) throw new Error('One of --stdio or --http is required.');
-  if (options.stdio && options.http) throw new Error('Use only one transport: --stdio or --http.');
+async function buildClient(options: { stdio?: string; http?: string; sse?: string; ssePost?: string; timeoutMs: number; silent?: boolean }): Promise<{ client: RpcClient; target: string; transport: 'stdio' | 'http' | 'sse' }> {
+  const selected = [options.stdio, options.http, options.sse].filter(Boolean).length;
+  if (selected === 0) throw new Error('One of --stdio, --http, or --sse is required.');
+  if (selected > 1) throw new Error('Use only one transport: --stdio, --http, or --sse.');
   if (options.stdio) {
     const transport = new StdioTransport();
     await transport.start({ stdioCommand: options.stdio, silent: options.silent });
     return { client: new StdioJsonRpcClient(transport, options.timeoutMs), target: options.stdio, transport: 'stdio' };
   }
-  return { client: new HttpJsonRpcClient(options.http as string, options.timeoutMs), target: options.http as string, transport: 'http' };
+  if (options.http) {
+    return { client: new HttpJsonRpcClient(options.http, options.timeoutMs), target: options.http, transport: 'http' };
+  }
+  return {
+    client: new SseJsonRpcClient(options.sse as string, options.timeoutMs, options.ssePost ?? options.sse),
+    target: options.sse as string,
+    transport: 'sse'
+  };
 }
 
 async function executeSuite(params: {
   stdio?: string;
   http?: string;
+  sse?: string;
+  ssePost?: string;
   outDir: string;
   runTests: boolean;
   runAudit: boolean;
@@ -66,7 +76,7 @@ async function executeSuite(params: {
   timeoutMs: number;
   failOn: FailOn;
 }): Promise<number> {
-  const { client, target, transport } = await buildClient({ stdio: params.stdio, http: params.http, timeoutMs: params.timeoutMs, silent: false });
+  const { client, target, transport } = await buildClient({ stdio: params.stdio, http: params.http, sse: params.sse, ssePost: params.ssePost, timeoutMs: params.timeoutMs, silent: false });
 
   const findings: Finding[] = [];
   let tools: ToolDescriptor[] = [];
@@ -128,7 +138,7 @@ async function executeSuite(params: {
 
 program
   .name('mcp-guard')
-  .description('Validate, test, and security-audit MCP servers over STDIO or HTTP JSON-RPC')
+  .description('Validate, test, and security-audit MCP servers over STDIO, HTTP JSON-RPC, or SSE + JSON-RPC')
   .showHelpAfterError();
 
 for (const commandName of ['validate', 'test', 'audit'] as const) {
@@ -136,6 +146,8 @@ for (const commandName of ['validate', 'test', 'audit'] as const) {
     .description(`${commandName} an MCP server`) 
     .option('--stdio <cmd>', 'Command used to launch MCP server over stdio')
     .option('--http <url>', 'HTTP JSON-RPC endpoint URL')
+    .option('--sse <url>', 'SSE endpoint URL for responses')
+    .option('--sse-post <url>', 'HTTP POST URL used to send JSON-RPC requests (defaults to --sse)')
     .option('--out <dir>', 'Output directory', 'reports')
     .option('--sarif <file>', 'SARIF output file (mainly for audit)', 'reports/report.sarif')
     .option('--profile <profile>', 'Rule profile: default|strict|paranoid', parseProfile, 'default')
@@ -147,6 +159,8 @@ for (const commandName of ['validate', 'test', 'audit'] as const) {
       const code = await executeSuite({
         stdio: options.stdio,
         http: options.http,
+        sse: options.sse,
+        ssePost: options.ssePost,
         outDir: options.out,
         runTests: doTests,
         runAudit: doAudit,

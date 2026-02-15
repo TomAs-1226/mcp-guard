@@ -16,9 +16,9 @@ mcp-guard --help
 
 ## Core commands
 
-- `mcp-guard validate --stdio <cmd>|--http <url> [--profile default|strict|paranoid] [--out reports] [--timeout-ms 30000]`
-- `mcp-guard test --stdio <cmd>|--http <url> [--out reports] [--timeout-ms 30000]`
-- `mcp-guard audit --stdio <cmd>|--http <url> [--profile ...] [--fail-on off|low|medium|high] [--sarif reports/report.sarif]`
+- `mcp-guard validate --stdio <cmd>|--http <url>|--sse <url> [--sse-post <url>] [--profile default|strict|paranoid] [--out reports] [--timeout-ms 30000]`
+- `mcp-guard test --stdio <cmd>|--http <url>|--sse <url> [--sse-post <url>] [--out reports] [--timeout-ms 30000]`
+- `mcp-guard audit --stdio <cmd>|--http <url>|--sse <url> [--sse-post <url>] [--profile ...] [--fail-on off|low|medium|high] [--sarif reports/report.sarif]`
 
 ## Scan and registry commands
 
@@ -35,4 +35,6 @@ mcp-guard --help
 
 ## Remote transport support
 
-`--http` supports HTTP JSON-RPC (POST) only. SSE is not supported.
+`--http` supports HTTP JSON-RPC (POST).
+
+`--sse` supports SSE response streams (GET) with request POSTs sent to `--sse-post` (or to `--sse` when omitted).

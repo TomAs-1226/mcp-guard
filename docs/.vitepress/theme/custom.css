@@ -121,3 +121,37 @@
     grid-template-columns: 1fr;
   }
 }
+
+.workflow-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 1.2rem 0;
+}
+
+.workflow-card {
+  border: 1px solid color-mix(in srgb, var(--vp-c-brand-1) 30%, transparent);
+  border-radius: 12px;
+  padding: 14px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--vp-c-bg) 88%, var(--vp-c-brand-1) 12%), var(--vp-c-bg));
+}
+
+.workflow-card h4 {
+  margin: 0 0 8px;
+}
+
+.workflow-card p {
+  margin: 0 0 10px;
+}
+
+.workflow-card code {
+  display: inline-block;
+  white-space: normal;
+  line-height: 1.35;
+}
+
+@media (max-width: 960px) {
+  .workflow-grid {
+    grid-template-columns: 1fr;
+  }
+}
