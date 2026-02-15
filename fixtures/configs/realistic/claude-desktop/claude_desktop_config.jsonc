@@ -1,0 +1,16 @@
+// realistic Claude Desktop MCP config
+{
+  "mcpServers": {
+    "local-safe": {
+      "command": "node ./server.cjs --api-key=fake_live_token_12345",
+      "permissions": ["filesystem:read", "network:none"]
+    },
+    "http-remote": {
+      "httpUrl": "http://127.0.0.1:4010",
+      "permissions": ["network:local"]
+    },
+    "broken-entry": {
+      "command": "node ./broken.cjs --token='malformed token with spaces'"
+    }
+  }
+}

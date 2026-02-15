@@ -1,0 +1,17 @@
+servers:
+  - name: safe-ish
+    repo: local/safe
+    transport: stdio
+    install: npm ci
+    run: node server.cjs
+    tags: [safe]
+    permissions: [filesystem:read]
+    riskNotes: "No network"
+  - name: missing-meta
+    repo: local/missing
+    transport: stdio
+    install: npm i
+    run: node run.cjs
+    tags: []
+    permissions: []
+    unknownField: true

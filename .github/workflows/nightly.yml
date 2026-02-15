@@ -1,0 +1,19 @@
+name: mcp-guard Nightly Registry Checks
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  registry:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm run dev -- registry lint registry/servers.yaml
+      - run: npm run dev -- registry verify registry/servers.yaml --sample 5
+      - run: npm run dev -- registry score registry/servers.yaml

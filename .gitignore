@@ -1,0 +1,7 @@
+node_modules/
+dist/
+reports/
+coverage/
+.DS_Store
+docs/.vitepress/dist/
+*.tgz

@@ -1,0 +1,9 @@
+servers:
+  - name: hello-mcp-server
+    repo: local/fixtures/hello-mcp-server
+    transport: stdio
+    install: npm install
+    run: node fixtures/servers/hello-mcp-server/server.cjs
+    tags: [demo, testing]
+    permissions: [filesystem:read]
+    riskNotes: "Demo server"
